@@ -47,7 +47,7 @@ export function Register() {
         console.error('Error creating account', error)
         setAuthError(toErrorMessage(error) || 'Ocurrió un error al crear la cuenta')
       } else {
-        await router.navigate({ to: '/welcome' })
+        await router.navigate({ to: '/gallery' })
       }
     },
   })

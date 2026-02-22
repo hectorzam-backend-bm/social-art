@@ -13,7 +13,7 @@ function LoginPage() {
 
   useEffect(() => {
     if (!isPending && session?.user) {
-      void router.navigate({ to: '/welcome' })
+      void router.navigate({ to: '/gallery' })
     }
   }, [isPending, router, session])
 

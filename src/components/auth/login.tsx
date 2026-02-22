@@ -44,7 +44,7 @@ export function Login() {
         console.error('Error logging in', error)
         setAuthError(toErrorMessage(error) || 'Ocurrió un error al iniciar sesión')
       } else {
-        router.navigate({ to: '/welcome' })
+        router.navigate({ to: '/gallery' })
       }
     },
   })

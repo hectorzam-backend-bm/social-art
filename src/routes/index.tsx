@@ -14,7 +14,7 @@ function HomePage() {
     if (isPending) return
 
     if (session?.user) {
-      void router.navigate({ to: '/welcome' })
+      void router.navigate({ to: '/gallery' })
       return
     }
 

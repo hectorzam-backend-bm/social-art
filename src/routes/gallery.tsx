@@ -1,5 +1,12 @@
 import { artServerFn } from '@/api/art.function'
 import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
 import type { ArtApiResponse, Data as ArtworkData } from '@/types/art-api'
 import { useQuery } from '@tanstack/react-query'
@@ -43,29 +50,59 @@ function GalleryPage() {
 
   return (
     <div className="min-h-screen px-6 py-10">
-      <div className="mx-auto w-full max-w-2xl rounded-xl border p-8">
-        <h1 className="text-2xl font-bold mb-6">Galería</h1>
+      <div className="mx-auto w-full max-w-6xl rounded-xl border p-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Galería</h1>
+          <Button
+            variant="outline"
+            onClick={async () => {
+              await authClient.signOut()
+              await router.navigate({ to: '/login' })
+            }}
+          >
+            Cerrar sesión
+          </Button>
+        </div>
 
-        {isLoading ? <p className="text-sm text-gray-600">Cargando...</p> : null}
-
-        {!isLoading ? (
-          <ul className="space-y-2 mb-8">
-            {artworks.map((artwork) => (
-              <li key={artwork.id} className="text-sm text-gray-900">
-                {artwork.title}
-              </li>
-            ))}
-          </ul>
+        {isLoading ? (
+          <p className="text-sm text-gray-600">Cargando...</p>
         ) : null}
 
-        <Button
-          onClick={async () => {
-            await authClient.signOut()
-            await router.navigate({ to: '/login' })
-          }}
-        >
-          Cerrar sesión
-        </Button>
+        {!isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+            {artworks.map((artwork) => (
+              <Card key={artwork.id} className="overflow-hidden">
+                <div className="aspect-4/3 w-full bg-muted overflow-hidden">
+                  {artwork.id ? (
+                    <img
+                      src={`https://picsum.photos/seed/${artwork.id}/843/600`}
+                      alt={artwork.title}
+                      className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                      Sin imagen
+                    </div>
+                  )}
+                </div>
+                <CardHeader>
+                  <CardTitle className="line-clamp-1" title={artwork.title}>
+                    {artwork.title}
+                  </CardTitle>
+                  <CardDescription className="line-clamp-1">
+                    {artwork.artist_display}
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter>
+                  <p className="text-xs text-muted-foreground">
+                    {artwork.date_display}
+                  </p>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   )

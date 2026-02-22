@@ -20,6 +20,7 @@ export type Data = {
   main_reference_number: string
   date_display: string
   artist_display: string
+  image_id: string | null
 }
 
 export type Info = {

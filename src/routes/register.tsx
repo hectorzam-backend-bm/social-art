@@ -1,7 +1,9 @@
-import { Register } from '@/components/auth/register'
-import { authClient } from '@/lib/auth-client'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useEffect } from 'react'
+
+import { Register } from '@/components/auth/register'
+import { MuseumSign } from '@/components/museum-sign'
+import { authClient } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/register')({
   component: RegisterPage,
@@ -18,11 +20,7 @@ function RegisterPage() {
   }, [isPending, router, session])
 
   if (isPending) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-sm text-gray-600">Verificando sesión...</p>
-      </div>
-    )
+    return <MuseumSign text="Verificando entrada" />
   }
 
   if (session?.user) {

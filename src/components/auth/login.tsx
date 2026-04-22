@@ -1,26 +1,13 @@
+import { useState } from 'react'
+import { useForm } from '@tanstack/react-form'
+import { useRouter } from '@tanstack/react-router'
+
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { ExhibitionFrame } from '@/components/auth/exhibition-frame'
+import { Field, toErrorMessage } from '@/components/auth/field'
 import type { LoginSchemaType } from '@/helpers/zod/login-schema'
 import { LoginSchema } from '@/helpers/zod/login-schema'
 import { authClient } from '@/lib/auth-client'
-import { useForm } from '@tanstack/react-form'
-import { useRouter } from '@tanstack/react-router'
-import { useState } from 'react'
-
-function toErrorMessage(error: unknown) {
-  if (typeof error === 'string') return error
-  if (
-    error &&
-    typeof error === 'object' &&
-    'message' in error &&
-    typeof (error as { message?: unknown }).message === 'string'
-  ) {
-    return (error as { message: string }).message
-  }
-  return 'Valor inválido'
-}
 
 export function Login() {
   const router = useRouter()
@@ -41,124 +28,109 @@ export function Login() {
         password: value.password,
       })
       if (error) {
-        console.error('Error logging in', error)
-        setAuthError(toErrorMessage(error) || 'Ocurrió un error al iniciar sesión')
+        setAuthError(toErrorMessage(error) || 'No fue posible iniciar sesión')
       } else {
-        router.navigate({ to: '/gallery' })
+        void router.navigate({ to: '/gallery' })
       }
     },
   })
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-md">
-        <h1 className="text-2xl font-bold text-center mb-6">
-          Iniciar Sesión en Art Gallery
-        </h1>
-        {authError && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm text-center">
-            {authError}
-          </div>
-        )}
-        <Card>
-          <form
-            className="space-y-4 p-4"
-            onSubmit={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              form.handleSubmit()
-            }}
-          >
-            <form.Field
-              name="email"
-              children={(field) => {
-                return (
-                  <div>
-                    <Label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Correo Electrónico
-                    </Label>
-                    <Input
-                      id={field.name}
-                      type="email"
-                      name={field.name}
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={field.handleBlur}
-                      placeholder="Correo Electrónico"
-                    />
-                    {field.state.meta.errors.length ? (
-                      <em
-                        role="alert"
-                        className="text-red-500 text-xs mt-1 block"
-                      >
-                        {field.state.meta.errors
-                          .map((error) => toErrorMessage(error))
-                          .join(', ')}
-                      </em>
-                    ) : null}
-                  </div>
-                )
-              }}
-            />
 
-            <form.Field
-              name="password"
-              children={(field) => {
-                return (
-                  <div>
-                    <Label
-                      htmlFor="password"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Contraseña
-                    </Label>
-                    <Input
-                      id={field.name}
-                      type="password"
-                      name={field.name}
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={field.handleBlur}
-                      placeholder="Contraseña"
-                    />
-                    {field.state.meta.errors.length ? (
-                      <em
-                        role="alert"
-                        className="text-red-500 text-xs mt-1 block"
-                      >
-                        {field.state.meta.errors
-                          .map((error) => toErrorMessage(error))
-                          .join(', ')}
-                      </em>
-                    ) : null}
-                  </div>
-                )
-              }}
+  return (
+    <ExhibitionFrame
+      eyebrow="Entrada de visitantes · Iniciar sesión"
+      title="Bienvenido de vuelta a la sala."
+    >
+      <form
+        className="space-y-7"
+        onSubmit={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          form.handleSubmit()
+        }}
+      >
+        {authError ? (
+          <div
+            role="alert"
+            className="border-l-2 border-(--critical) bg-paper-inset px-4 py-3"
+          >
+            <p className="eyebrow mb-1 text-(--critical)">Aviso</p>
+            <p className="font-serif italic text-sm text-ink-soft">
+              {authError}
+            </p>
+          </div>
+        ) : null}
+
+        <form.Field
+          name="email"
+          children={(field) => (
+            <Field
+              id="email"
+              index="01"
+              label="Correo electrónico"
+              type="email"
+              autoComplete="email"
+              placeholder="nombre@ejemplo.com"
+              value={field.state.value}
+              onChange={field.handleChange}
+              onBlur={field.handleBlur}
+              errors={field.state.meta.errors}
             />
-            <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
-              children={([canSubmit, isSubmitting]) => (
-                <>
-                  <Button type="submit" disabled={!canSubmit}>
-                    {isSubmitting ? '...' : 'Iniciar sesión'}
-                  </Button>
-                </>
-              )}
+          )}
+        />
+
+        <form.Field
+          name="password"
+          children={(field) => (
+            <Field
+              id="password"
+              index="02"
+              label="Contraseña"
+              type="password"
+              autoComplete="current-password"
+              placeholder="••••••••"
+              value={field.state.value}
+              onChange={field.handleChange}
+              onBlur={field.handleBlur}
+              errors={field.state.meta.errors}
             />
-            <Button
-              type="button"
-              variant="link"
-              onClick={() => {
-                void router.navigate({ to: '/register' })
-              }}
-            >
-              ¿No tienes cuenta? Regístrate
-            </Button>
-          </form>
-        </Card>
-      </div>
-    </div>
+          )}
+        />
+
+        <div className="pt-2">
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
+            children={([canSubmit, isSubmitting]) => (
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full"
+                disabled={!canSubmit}
+              >
+                {isSubmitting ? 'Abriendo la puerta…' : 'Entrar a la galería'}
+              </Button>
+            )}
+          />
+        </div>
+
+        <div className="flex items-center gap-4 pt-2">
+          <div className="h-px flex-1 bg-rule" />
+          <span className="font-mono text-[10px] tracking-[0.14em] text-ink-faint uppercase">
+            o
+          </span>
+          <div className="h-px flex-1 bg-rule" />
+        </div>
+
+        <p className="text-center font-serif italic text-sm text-ink-soft">
+          ¿Primera visita?{' '}
+          <button
+            type="button"
+            onClick={() => void router.navigate({ to: '/register' })}
+            className="font-serif not-italic text-oxblood underline decoration-rule-strong underline-offset-[5px] hover:decoration-oxblood"
+          >
+            Regístrate en la recepción
+          </button>
+        </p>
+      </form>
+    </ExhibitionFrame>
   )
 }
